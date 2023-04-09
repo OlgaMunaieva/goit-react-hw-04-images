@@ -18,16 +18,12 @@ export const App = () => {
       setPhotos([]);
       setPage(1);
       uploadPhotos(searchQuery, 1);
-      // this.setState({ query: searchQuery, photos: [], page: 1 });
     }
   };
 
   const nextPage = () => {
     setPage(page + 1);
     uploadPhotos(query, page + 1);
-    // this.setState(prevState => ({
-    //   page: prevState.page + 1,
-    // }));
   };
 
   async function uploadPhotos(newQuery, newPage) {
@@ -49,7 +45,6 @@ export const App = () => {
           setPhotos([...photos, ...hits]);
         }
       } catch {
-        // console.log(error);
         setError(error);
       } finally {
         setIsLoading(false);
