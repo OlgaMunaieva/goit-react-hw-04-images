@@ -1,71 +1,69 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import fetchPhotosWithQuery from 'api/api';
 import Searchbar from './search_bar/Searchbar';
 import ImageGallery from './image_gallery/ImageGallery';
 import Button from './button/Button';
 import Loader from './loader/Loader';
 
-export class App extends Component {
-  state = {
-    photos: [],
-    query: '',
-    page: 1,
-    isLoading: false,
-    error: null,
+export const App = () => {
+  const [photos, setPhotos] = useState([]);
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const getSearchQuery = searchQuery => {
+    if (query !== searchQuery) {
+      setQuery(searchQuery);
+      setPhotos([]);
+      setPage(1);
+      uploadPhotos(searchQuery, 1);
+      // this.setState({ query: searchQuery, photos: [], page: 1 });
+    }
   };
 
-  async uploadPhotos(query) {
-    this.setState({ isLoading: true });
+  const nextPage = () => {
+    setPage(page + 1);
+    uploadPhotos(query, page + 1);
+    // this.setState(prevState => ({
+    //   page: prevState.page + 1,
+    // }));
+  };
 
-    try {
-      const { totalHits, hits } = await fetchPhotosWithQuery(
-        query,
-        this.state.page
-      );
-      if (!totalHits) {
-        throw new Error('No data');
+  async function uploadPhotos(newQuery, newPage) {
+    setIsLoading({ isLoading: true });
+
+    if (newPage !== page || newQuery !== query) {
+      try {
+        const { totalHits, hits } = await fetchPhotosWithQuery(
+          newQuery !== query ? newQuery : query,
+          newPage !== page ? newPage : page
+        );
+
+        if (!totalHits) {
+          throw new Error('No data');
+        }
+        if (newQuery !== query) {
+          setPhotos(hits);
+        } else {
+          setPhotos([...photos, ...hits]);
+        }
+      } catch {
+        // console.log(error);
+        setError(error);
+      } finally {
+        setIsLoading(false);
       }
-
-      this.setState(p => ({ photos: [...p.photos, ...hits] }));
-    } catch (error) {
-      this.setState({ error });
-    } finally {
-      this.setState({ isLoading: false });
     }
   }
-
-  getSearchQuery = searchQuery => {
-    if (this.state.query !== searchQuery) {
-      this.setState({ query: searchQuery, photos: [], page: 1 });
-    }
-  };
-
-  nextPage = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
-  };
-
-  componentDidUpdate(_, prevState) {
-    if (
-      prevState.page !== this.state.page ||
-      prevState.query !== this.state.query
-    ) {
-      this.uploadPhotos(this.state.query);
-    }
-  }
-
-  render() {
-    const { query, page, photos, isLoading } = this.state;
-    const isShowGallery = photos.length > 0 && query;
-    const isShowButton = isShowGallery && !isLoading && !(photos.length % 12);
-    return (
-      <>
-        <Searchbar onSubmit={this.getSearchQuery} />
-        {isShowGallery && <ImageGallery photos={photos} page={page} />}
-        {isShowButton && <Button onClick={this.nextPage} />}
-        {isLoading && <Loader />}
-      </>
-    );
-  }
-}
+  const isShowGallery = query && photos.length > 0;
+  const isShowButton = isShowGallery && !isLoading && !(photos.length % 12);
+  return (
+    <>
+      <Searchbar onSubmit={getSearchQuery} />
+      {isShowGallery && <ImageGallery photos={photos} page={page} />}
+      {isShowButton && <Button onClick={nextPage} />}
+      {isLoading && <Loader />}
+    </>
+  );
+};
