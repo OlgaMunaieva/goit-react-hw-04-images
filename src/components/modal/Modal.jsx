@@ -11,22 +11,12 @@ const Modal = ({ src, alt, onClick }) => {
     };
   });
 
-  // componentDidMount() {
-  //   window.addEventListener('keydown', this.closeModal);
-  // }
-
-  // componentWillUnmount() {
-  //   window.removeEventListener('keydown', this.closeModal);
-  // }
-
   function closeModal({ target, currentTarget, code }) {
     if (code === 'Escape' || target === currentTarget) {
       onClick();
     }
   }
 
-  // render() {
-  //   const { src, alt } = this.props;
   return (
     <div className="Overlay" onClick={closeModal}>
       <div className="Modal">
@@ -34,7 +24,6 @@ const Modal = ({ src, alt, onClick }) => {
       </div>
     </div>
   );
-  // }
 };
 
 Modal.propTypes = {

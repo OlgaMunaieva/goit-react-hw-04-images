@@ -22,16 +22,12 @@ const Searchbar = ({ onSubmit }) => {
     setForm(event.target);
   };
 
-  // render() {
-  //   const { handleOnSubmit, handleChange } = this;
   return (
     <header className="Searchbar">
       <form className="SearchForm" onSubmit={handleOnSubmit}>
         <button type="submit" className="SearchForm-button">
           <FiSearch />
-          {/* <span className="SearchForm-button-label">Search</span> */}
         </button>
-
         <input
           className="SearchForm-input"
           onChange={handleChange}
@@ -44,7 +40,6 @@ const Searchbar = ({ onSubmit }) => {
       </form>
     </header>
   );
-  // }
 };
 
 Searchbar.propTypes = {

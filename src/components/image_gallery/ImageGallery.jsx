@@ -19,9 +19,6 @@ const ImageGallery = ({ photos, page }) => {
     setIsShowModal(false);
   };
 
-  // render() {
-  //   const { isShowModal, largeImage, alt } = this.state;
-  //   const { hideModal, showModal } = this;
   return (
     <>
       {isShowModal && <Modal src={largeImage} alt={alt} onClick={hideModal} />}
@@ -38,7 +35,6 @@ const ImageGallery = ({ photos, page }) => {
       </ul>
     </>
   );
-  // }
 };
 
 ImageGallery.propTypes = {

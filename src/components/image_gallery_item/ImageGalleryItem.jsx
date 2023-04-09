@@ -1,14 +1,10 @@
 import '../styles.css';
-// import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 const ImageGalleryItem = ({ src, alt, largeImage, isShowModal }) => {
   const createModal = () => {
     isShowModal(largeImage, alt);
   };
-
-  // render() {
-  //   const { src, alt } = this.props;
 
   return (
     <li className="ImageGalleryItem">
@@ -20,7 +16,6 @@ const ImageGalleryItem = ({ src, alt, largeImage, isShowModal }) => {
       />
     </li>
   );
-  // }
 };
 
 ImageGalleryItem.propTypes = {
