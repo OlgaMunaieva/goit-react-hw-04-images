@@ -4,15 +4,20 @@ import PropTypes from 'prop-types';
 
 const Modal = ({ src, alt, onClick }) => {
   useEffect(() => {
+    const closeModal = ({ code }) => {
+      if (code === 'Escape') {
+        onClick();
+      }
+    };
     window.addEventListener('keydown', closeModal);
 
     return () => {
       window.removeEventListener('keydown', closeModal);
     };
-  });
+  }, [onClick]);
 
-  function closeModal({ target, currentTarget, code }) {
-    if (code === 'Escape' || target === currentTarget) {
+  function closeModal({ target, currentTarget }) {
+    if (target === currentTarget) {
       onClick();
     }
   }

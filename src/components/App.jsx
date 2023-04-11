@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import fetchPhotosWithQuery from 'api/api';
+import { useEffect, useState } from 'react';
+import { fetchPhotosWithQuery, PER_PAGE } from 'api/api';
 import Searchbar from './search_bar/Searchbar';
 import ImageGallery from './image_gallery/ImageGallery';
 import Button from './button/Button';
@@ -10,49 +10,40 @@ export const App = () => {
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('No Data');
+
+  useEffect(() => {
+    if (!query) return;
+
+    setIsLoading(true);
+    fetchPhotosWithQuery(query, page)
+      .then(({ totalHits, hits }) => {
+        if (!totalHits) {
+          throw new Error(error);
+        }
+        setPhotos(prevPhotos => [...prevPhotos, ...hits]);
+      })
+      .catch(error => {
+        setError(error.message);
+      })
+      .finally(() => setIsLoading(false));
+  }, [query, page, error]);
 
   const getSearchQuery = searchQuery => {
     if (query !== searchQuery) {
       setQuery(searchQuery);
       setPhotos([]);
       setPage(1);
-      uploadPhotos(searchQuery, 1);
     }
   };
 
   const nextPage = () => {
-    setPage(page + 1);
-    uploadPhotos(query, page + 1);
+    setPage(prevPage => prevPage + 1);
   };
 
-  async function uploadPhotos(newQuery, newPage) {
-    setIsLoading({ isLoading: true });
-
-    if (newPage !== page || newQuery !== query) {
-      try {
-        const { totalHits, hits } = await fetchPhotosWithQuery(
-          newQuery !== query ? newQuery : query,
-          newPage !== page ? newPage : page
-        );
-
-        if (!totalHits) {
-          throw new Error('No data');
-        }
-        if (newQuery !== query) {
-          setPhotos(hits);
-        } else {
-          setPhotos([...photos, ...hits]);
-        }
-      } catch {
-        setError(error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  }
   const isShowGallery = query && photos.length > 0;
-  const isShowButton = isShowGallery && !isLoading && !(photos.length % 12);
+  const isShowButton =
+    isShowGallery && !isLoading && !(photos.length % PER_PAGE);
   return (
     <>
       <Searchbar onSubmit={getSearchQuery} />
